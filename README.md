@@ -16,7 +16,7 @@ Las funciones comenzadas con check hacen una revisión constante de las colision
 Hay una clase base llamada fruta, de la que se aclara el tipo base de la fruta, le siguen las frutas más básicas, apple, carrot y pear, las cuales dicen una figura distinta en un método draw y su tipo, originario de la fruta.
 
 # Diagrama UML
-![](https://github.com/SanchezRuano22211659/snakeGame/blob/main/UMLsnakegame.png)
+![](https://github.com/SanchezRuano22211659/snakeGame/blob/main/UMLsnakegame.svg)
 # Referencias
 - [freecodecamp](https://www.freecodecamp.org/news/how-to-build-a-snake-game-in-javascript/)
 - [juego de la serpiente js](https://www.lawebdelprogramador.com/codigo/JavaScript/6111-Juego-de-la-serpiente-snake-en-javascript.html)
