@@ -1,143 +1,89 @@
-let vel = 15;
-
-let numSegments = 2;
-let direction = 'right';
+//var
+let fruitType;
+let snakePlayer;
 
 const xStart = 0; 
 const yStart = 250;
 const diff = 10;
 
-let xCor = [];
-let yCor = [];
-
-let xFruit;
-let yFruit;
-let fruitType;
-let fruitSize=10;
+let vel=15;
+let direction='right';
 
 let scoreElem;
 let velocity;
 
-function setup() {
+let compareX;
+let compareY;
+
+function gameRestart()
+{
+  if (keyCode === ENTER)
+    {
+      location.reload()
+    }
+  }
+
+function drawCompareX()
+{
+  compareX = createDiv(0 + ' = ' + 0);
+  compareX.position(380, 50);
+  compareX.id = 'compareX';
+  compareX.style('color', 'white');
+}
+function drawCompareY()
+{
+  compareY = createDiv(0 + ' = ' + 0);
+  compareY.position(20, 50);
+  compareY.id = 'compareY';
+  compareY.style('color', 'white');
+}
+function drawScore()
+{
   scoreElem = createDiv('Score = 0');
   scoreElem.position(20, 20);
   scoreElem.id = 'score';
   scoreElem.style('color', 'white');
+}
+function drawVelocity()
+{
   velocity = createDiv('velocity = ' + vel);
   velocity.position(380, 20);
-  velocity.id = 'score';
+  velocity.id = 'velocity';
   velocity.style('color', 'white');
-
-  createCanvas(500, 500);
-  frameRate(vel);
-  stroke(255);
-  strokeWeight(10);
-  fruitType = new apple();
-  fruitSpawn();
-  for (let i = 0; i < numSegments; i++) {
-    xCor.push(xStart + i * diff);
-    yCor.push(yStart);
-  }
 }
 
-function draw() {
-  background(0);
-  for (let i = 0; i < numSegments - 1; i++) {
-    line(xCor[i], yCor[i], xCor[i + 1], yCor[i + 1]);
-  }
-  fruitType.draw();
-  updateSnakeCoordinates();
-  checkForFruit();
-  checkGameStatus();
-  velocity.html('velocity = ' + vel);
-}
+function setup()
+{
+  drawScore();
+  drawVelocity();
+  drawCompareX();
+  drawCompareY();
   
-function updateSnakeCoordinates() {
-  for (let i = 0; i < numSegments - 1; i++) {
-    xCor[i] = xCor[i + 1];
-    yCor[i] = yCor[i + 1];
-  }
-  switch (direction) {
-    case 'right':
-      xCor[numSegments - 1] = xCor[numSegments - 2] + diff;
-      yCor[numSegments - 1] = yCor[numSegments - 2];
-      break;
-    case 'up':
-      xCor[numSegments - 1] = xCor[numSegments - 2];
-      yCor[numSegments - 1] = yCor[numSegments - 2] - diff;
-      break;
-    case 'left':
-      xCor[numSegments - 1] = xCor[numSegments - 2] - diff;
-      yCor[numSegments - 1] = yCor[numSegments - 2];
-      break;
-    case 'down':
-      xCor[numSegments - 1] = xCor[numSegments - 2];
-      yCor[numSegments - 1] = yCor[numSegments - 2] + diff;
-      break;
-  }
+  createCanvas(500,500);
+  frameRate(vel);
+  
+  snakePlayer = new snake(direction);
+  snakePlayer.snakeStart();
+
+  fruitType = new apple();
+  fruitType.fruitSpawn();
 }
-function fruitSpawn()
+function draw()
 {
-  xFruit = floor(random(10, (width - 100) / 10)) * 10;
-  yFruit = floor(random(10, (height - 100) / 10)) * 10;
+  gameRestart();
+  background(0);
+  snakePlayer.draw();
+  fruitType.draw();
+  snakePlayer.direction = direction;
+  snakePlayer.updateSnakeCoordinates();
+  snakePlayer.checkForFruit();
+  snakePlayer.checkGameStatus();
+  velocity.html('velocity = ' + vel);
+  
+  compareX.html(floor(snakePlayer.xCor[snakePlayer.xCor.length - 1]) + ' = ' + fruitType.xFruit);
+  compareY.html(floor(snakePlayer.yCor[snakePlayer.yCor.length - 1]) + ' = ' + fruitType.yFruit);
 }
-function randomFruit()
-{
-  let randomType = floor(random(3));
-  if (randomType === 0) {
-      fruitType = new apple();
-    } else if (randomType === 1) {
-      fruitType = new carrot();
-    } else {
-      fruitType = new pear();
-    }
-  fruitSpawn();
-}
-function checkGameStatus() {
-  if (
-    xCor[xCor.length - 1] > width ||
-    xCor[xCor.length - 1] < 0 ||
-    yCor[yCor.length - 1] > height ||
-    yCor[yCor.length - 1] < 0 ||
-    checkSnakeCollision()
-  ) {
-    noLoop();
-    const scoreVal = parseInt(scoreElem.html().substring(8));
-    scoreElem.html('Game ended! Your score was ' + scoreVal); 
-  }
-}
-function checkForFruit() {
-  point(xFruit, yFruit);
-  if (xCor[xCor.length - 1] === xFruit && yCor[yCor.length - 1] === yFruit) {
-    const prevScore = parseInt(scoreElem.html().substring(8));
-    if (fruitType.type == 'apple')
-      {
-        scoreElem.html('Score = ' + (prevScore + 1));
-      }
-    else if (fruitType.type == 'carrot')
-      {
-        scoreElem.html('Score = ' + (prevScore + 2));
-      }
-    else if (fruitType.type == 'pear')
-      {
-        scoreElem.html('Score = ' + (prevScore + 3));
-      }
-    vel += 1;
-    xCor.unshift(xCor[0]);
-    yCor.unshift(yCor[0]);
-    numSegments++;
-    randomFruit();
-  }
-}
-function checkSnakeCollision() {
-  const snakeHeadX = xCor[xCor.length - 1];
-  const snakeHeadY = yCor[yCor.length - 1];
-  for (let i = 0; i < xCor.length - 1; i++) {
-    if (xCor[i] === snakeHeadX && yCor[i] === snakeHeadY) {
-      return true;
-    }
-  }
-}
+
 function keyPressed() //snake movement
 {
   switch (keyCode) {
@@ -163,24 +109,148 @@ function keyPressed() //snake movement
       break;
   }
 }
-class fruit
+
+class snake
   {
+    constructor(direction)
+    {
+      this.numSegments=3;
+      this.xCor=[];
+      this.yCor=[];
+      this.direction=direction;
+    }
+    draw()
+    {
+      stroke(255);
+      strokeWeight(10);
+      for (let i = 0; i < this.numSegments - 1; i++)
+      {
+         line(this.xCor[i], this.yCor[i], this.xCor[i + 1], this.yCor[i + 1]);
+      }
+    }
+    updateSnakeCoordinates() {
+  for (let i = 0; i < this.numSegments - 1; i++) {
+    this.xCor[i] = this.xCor[i + 1];
+    this.yCor[i] = this.yCor[i + 1];
+  }
+  switch (this.direction) {
+    case 'right':
+      this.xCor[this.numSegments - 1] = this.xCor[this.numSegments - 2] + diff;
+      this.yCor[this.numSegments - 1] = this.yCor[this.numSegments - 2];
+      break;
+    case 'up':
+      this.xCor[this.numSegments - 1] = this.xCor[this.numSegments - 2];
+      this.yCor[this.numSegments - 1] = this.yCor[this.numSegments - 2] - diff;
+      break;
+    case 'left':
+      this.xCor[this.numSegments - 1] = this.xCor[this.numSegments - 2] - diff;
+      this.yCor[this.numSegments - 1] = this.yCor[this.numSegments - 2];
+      break;
+    case 'down':
+      this.xCor[this.numSegments - 1] = this.xCor[this.numSegments - 2];
+      this.yCor[this.numSegments - 1] = this.yCor[this.numSegments - 2] + diff;
+      break;
+  }
+    }
+    snakeStart()
+    {
+      for (let i = 0; i < this.numSegments; i++)
+      {
+          this.xCor.push(xStart + i * diff);
+          this.yCor.push(yStart);
+      }
+    }
+    checkGameStatus() {
+  if (
+    this.xCor[this.xCor.length - 1] > width ||
+    this.xCor[this.xCor.length - 1] < 0 ||
+    this.yCor[this.yCor.length - 1] > height ||
+    this.yCor[this.yCor.length - 1] < 0 ||
+    this.checkSnakeCollision()
+  ) {
+    noLoop();
+    const scoreVal = parseInt(scoreElem.html().substring(8));
+    scoreElem.html('Game ended! Your score was ' + scoreVal);
+    let endtime = second();
+    while (second() < endtime + 4){} 
+      location.reload()
+      }
+  }
+    checkForFruit() {
+    point(fruitType.xFruit, fruitType.yFruit);
+  if (floor(this.xCor[this.xCor.length - 1]) === fruitType.xFruit && floor(this.yCor[this.yCor.length - 1]) === fruitType.yFruit) {
+    const prevScore = parseInt(scoreElem.html().substring(8));
+    if (fruitType.type == 'apple')
+      {
+        scoreElem.html('Score = ' + (prevScore + 1));
+      }
+    else if (fruitType.type == 'carrot')
+      {
+        scoreElem.html('Score = ' + (prevScore + 2));
+      }
+    else if (fruitType.type == 'pear')
+      {
+        scoreElem.html('Score = ' + (prevScore + 3));
+      }
+    vel += 1;
+    this.xCor.unshift(this.xCor[0]);
+    this.yCor.unshift(this.yCor[0]);
+    this.numSegments += 1;
+    fruitType.randomFruit();
+    }
+  }
+    checkSnakeCollision() {
+  const snakeHeadX = this.xCor[this.xCor.length - 1];
+  const snakeHeadY = this.yCor[this.yCor.length - 1];
+  for (let i = 0; i < this.xCor.length - 1; i++) {
+    if (this.xCor[i] === snakeHeadX && this.yCor[i] === snakeHeadY) {
+      return true;
+    }
+  }
+    }
+    
+  }
+class fruit
+{
     constructor()
     {
       this.type = 'null'
+      this.xFruit=floor(random(10,( (width-100)/10))) * 10;
+      this.yFruit=floor(random(10,( (height-100)/10))) * 10;
+      this.fruitSize=10;
     }
+    fruitSpawn()
+{
+  const xIndex = floor(random(10,( (width-100)/10)));
+  const yIndex = floor(random(10,( (height-100)/10)));
+  this.xFruit = xIndex * 10;
+  this.yFruit = yIndex * 10;
+}
+    randomFruit()
+  {
+    let randomType = floor(random(3));
+    if (randomType === 0) {
+      fruitType = new apple();
+    } else if (randomType === 1) {
+      fruitType = new carrot();
+    } else {
+      fruitType = new pear();
+    }
+  this.fruitSpawn();
   }
+}
 class apple extends fruit
 {
   constructor()
   {
     super()
     this.type = 'apple';
-    
   }
   draw()
   {
-    ellipse(xFruit, yFruit, fruitSize / 3, fruitSize / 3);
+    stroke(227, 37, 37);
+    strokeWeight(10);
+    ellipse(this.xFruit, this.yFruit, this.fruitSize / 3, this.fruitSize / 3);
   }
 }
 class carrot extends fruit
@@ -192,12 +262,15 @@ class carrot extends fruit
   }
   draw()
   {
-    triangle(xFruit - fruitSize / 10,
-             yFruit + fruitSize / 10,
-             xFruit,
-             yFruit - fruitSize / 10,
-             xFruit + fruitSize / 10,
-             yFruit + fruitSize / 10);
+    stroke(237, 145, 33);
+    strokeWeight(10);
+    triangle(this.xFruit - this.fruitSize / 10,
+             this.yFruit + this.fruitSize / 10,
+             this.xFruit,
+             this.yFruit - this.fruitSize / 10,
+             this.xFruit + this.fruitSize / 10,
+             this.yFruit + this.fruitSize / 10
+  );
   }
 }
 class pear extends fruit
@@ -209,6 +282,8 @@ class pear extends fruit
   }
   draw()
   {
-    rect(xFruit, yFruit, fruitSize / 3, fruitSize / 3);
+    stroke(164, 255, 0);
+    strokeWeight(10);
+    rect(this.xFruit, this.yFruit, this.fruitSize / 3, this.fruitSize / 3);
   }
 }
