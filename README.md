@@ -22,4 +22,4 @@ Hay una clase base llamada fruta, de la que se aclara el tipo base de la fruta, 
 # Referencias
 - [freecodecamp](https://www.freecodecamp.org/news/how-to-build-a-snake-game-in-javascript/)
 - [juego de la serpiente js](https://www.lawebdelprogramador.com/codigo/JavaScript/6111-Juego-de-la-serpiente-snake-en-javascript.html)
-- [p5 snake game](https://p5js.org/es/examples/interaction-snake-game.html)
+- [p5 snake game](https://archive.p5js.org/examples/interaction-snake-game.html)
